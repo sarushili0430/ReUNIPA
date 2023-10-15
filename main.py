@@ -1,7 +1,8 @@
 import login
 
-ID = "XXXXXXXX"
-PWD = "XXXXXXXX"
+
+ID = "XXXXXXX"
+PWD = "XXXXXXX"
 
 
 a = login.UNIPA_Login(ID,PWD)
