@@ -1,7 +1,7 @@
 import login
 
-ID = "2022m089"
-PWD = "Saru0430"
+ID = "XXXXXXX"
+PWD = "XXXXXXX"
 
 a = login.Login(ID,PWD)
 a.login()
