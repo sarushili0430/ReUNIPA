@@ -1,4 +1,4 @@
-import login2 as login
+import login
 
 ID = "2022m089"
 PWD = "Saru0430"
