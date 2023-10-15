@@ -13,8 +13,8 @@ import time
 CHROMEDRIVER = "chromedriver.exe"
 SIGNINURL = "https://upweb3.kuas.ac.jp/uprx/"
 
-ID = "2022m089"
-PWD = "Saru0430"
+ID = "XXXXXXX"
+PWD = "XXXXXXX"
 
 #Setting up the selenium browser
 chrome_service = service.Service(executable_path=CHROMEDRIVER)
