@@ -7,13 +7,18 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from dotenv import load_dotenv
+
 from datetime import datetime
 import time
+import os
+
+load_dotenv()
 
 #chromedriverのパスを下で指定してください
 #ex) "/Users/xxx/xxxx/chromedriver.exe"
 CHROMEDRIVER = "chromedriver.exe"
-SIGNINURL = "https://upweb3.kuas.ac.jp/uprx/"
+SIGNINURL = os.environ["UNIPA_URL"]
 
 #Setting up the selenium browser
 chrome_service = service.Service(executable_path=CHROMEDRIVER)

@@ -1,14 +1,20 @@
 import login
 
+from dotenv import load_dotenv
 
-ID = "XXXXXXX"
-PWD = "XXXXXXX"
+import os
 
+load_dotenv()
 
-a = login.UNIPA_Login(ID,PWD)
+UNIPA_ID = os.environ["UNIPA_ID"]
+UNIPA_PWD = os.environ["UNIPA_PWD"]
+TEAMS_ID = os.environ["TEAMS_ID"]
+TEAMS_PWD = os.environ["TEAMS_PWF"]
+
+a = login.UNIPA_Login(UNIPA_ID, UNIPA_PWD)
 a.login()
 assignments = a.get_assignment()
 
-b = login.Teams_Login("2022m089@kuas.ac.jp","Saru0430")
+b = login.Teams_Login(TEAMS_ID, TEAMS_PWD)
 b.login()
 print(assignments)
