@@ -3,6 +3,7 @@ from selenium.webdriver.chrome import service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -13,9 +14,6 @@ import time
 #ex) "/Users/xxx/xxxx/chromedriver.exe"
 CHROMEDRIVER = "chromedriver.exe"
 SIGNINURL = "https://upweb3.kuas.ac.jp/uprx/"
-
-ID = "XXXXXXX"
-PWD = "XXXXXXX"
 
 #Setting up the selenium browser
 chrome_service = service.Service(executable_path=CHROMEDRIVER)
@@ -59,8 +57,8 @@ class UNIPA_Login():
         username_input = self.driver.find_element(By.ID,"loginForm:userId")
         pwd_input = self.driver.find_element(By.ID,"loginForm:password")
         login_btn = self.driver.find_element(By.ID,"loginForm:loginButton")
-        username_input.send_keys(ID)
-        pwd_input.send_keys(PWD)
+        username_input.send_keys(self.id)
+        pwd_input.send_keys(self.pwd)
         login_btn.click()
 
     def get_assignment(self):
@@ -73,9 +71,12 @@ class UNIPA_Login():
         self.wait.until(EC.presence_of_all_elements_located)
         juyo_button = self.driver.find_element(By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")
         juyo_button.click()
+
+        #If「もっと表示」button, click
         self.wait.until(EC.presence_of_all_elements_located)
-        motto_button = self.driver.find_element(By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/div/div[2]/a")
-        motto_button.click()
+        motto_button = check_exists_by_xpath(driver=self.driver,xpath="/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/div/div[2]/a")
+        if motto_button:
+            motto_button.click()
         
         #なんでかわからないけどこいつ単体じゃうまくいかないissue行き
         self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-datalist-item")))
@@ -129,5 +130,10 @@ class Teams_Login():
         #login_btn = self.driver.find_element(By.ID,"idSIButton9")
         #self.wait.until(EC.staleness_of(login_btn))
 
-
+def check_exists_by_xpath(driver,xpath):
+    try:
+        element = driver.find_element(By.XPATH,xpath)
+    except NoSuchElementException:
+        return False
+    return element
     
