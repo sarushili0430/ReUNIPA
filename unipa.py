@@ -84,10 +84,8 @@ class UNIPA_Login():
         if motto_button:
             motto_button.click()
         
-        #なんでかわからないけどこいつ単体じゃうまくいかないissue行き
+        #Taking out the time.sleep() in the future
         self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-datalist-item")))
-        
-        #長めにsleepしておくしかない
         time.sleep(1)
 
         notify = self.driver.find_elements(By.CLASS_NAME,"ui-datalist-item")
