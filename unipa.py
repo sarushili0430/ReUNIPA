@@ -43,7 +43,7 @@ options.add_experimental_option('useAutomationExtension', False)
 options.page_load_strategy = 'eager'
 options.add_argument('--disable-extensions')
 options.add_argument("--start-maximized")
-#options.add_argument("--headless")
+options.add_argument("--headless")
 
 
 class UNIPA_Login():
@@ -55,7 +55,6 @@ class UNIPA_Login():
         self.driver = webdriver.Chrome(service=chrome_service,options=options)
         self.wait = WebDriverWait(self.driver,timeout=30)
         self.driver.get(SIGNINURL)
-
 
     def login(self):
         #Login to account
@@ -86,14 +85,12 @@ class UNIPA_Login():
         
         #Taking out the time.sleep() in the future
         self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-datalist-item")))
-        time.sleep(1)
+        time.sleep(3)
 
         notify = self.driver.find_elements(By.CLASS_NAME,"ui-datalist-item")
-        print(len(notify))
         cnt = 0
         for _ in notify:
             try:
-                _.find_element(By.CLASS_NAME,"signPortalKadai")
                 assignment_name = _.find_element(By.ID,"funcForm:j_idt162:j_idt211:"+str(cnt)+":j_idt232").get_attribute("textContent")
                 assignment_deadline = _.find_elements(By.CSS_SELECTOR,"span.textDate")[1].get_attribute("textContent")
                 cnt += 1
