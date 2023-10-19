@@ -1,5 +1,6 @@
 #import login
 from unipa import UNIPA_Login
+from unipa import UNIPA_Submit
 from dotenv import load_dotenv
 
 import os
@@ -12,9 +13,10 @@ TEAMS_ID = os.environ["TEAMS_ID"]
 TEAMS_PWD = os.environ["TEAMS_PWD"]
 
 a = UNIPA_Login(UNIPA_ID, UNIPA_PWD)
-a.login()
 assignments = a.get_assignment()
 print(assignments)
+b = UNIPA_Submit(UNIPA_ID,UNIPA_PWD)
+b.submit_assignment(id=assignments[0][0],file_path="")
 
 #b = login.Teams_Login(TEAMS_ID, TEAMS_PWD)
 #b.login()

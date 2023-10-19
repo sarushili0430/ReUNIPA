@@ -3,7 +3,6 @@ from selenium.webdriver.chrome import service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -43,7 +42,8 @@ options.add_experimental_option('useAutomationExtension', False)
 options.page_load_strategy = 'eager'
 options.add_argument('--disable-extensions')
 options.add_argument("--start-maximized")
-options.add_argument("--headless")
+#options.add_argument("--headless")
+
 
 
 class UNIPA_Login():
@@ -55,6 +55,7 @@ class UNIPA_Login():
         self.driver = webdriver.Chrome(service=chrome_service,options=options)
         self.wait = WebDriverWait(self.driver,timeout=30)
         self.driver.get(SIGNINURL)
+        self.login()
 
     def login(self):
         #Login to account
@@ -91,12 +92,63 @@ class UNIPA_Login():
         cnt = 0
         for _ in notify:
             try:
+                assignment_id = "funcForm:j_idt162:j_idt211:"+str(cnt)+":j_idt232"
                 assignment_name = _.find_element(By.ID,"funcForm:j_idt162:j_idt211:"+str(cnt)+":j_idt232").get_attribute("textContent")
                 assignment_deadline = _.find_elements(By.CSS_SELECTOR,"span.textDate")[1].get_attribute("textContent")
                 cnt += 1
-                assignment_list.append([assignment_name,assignment_deadline])
+                assignment_list.append([assignment_id,assignment_name,assignment_deadline])
             except:
                 pass
 
-        self.driver.quit()
+        self.driver.close()
         return assignment_list
+
+class UNIPA_Submit(UNIPA_Login):
+
+    def __init__(self, ID, PWD):
+        super().__init__(ID, PWD)
+        #Opening the Chrome browser
+        #self.driver = webdriver.Chrome(service=chrome_service,options=options)
+        #self.wait = WebDriverWait(self.driver,timeout=30)
+    
+    def submit_assignment(self,id,file_path):
+        #Getting the assignment information
+        self.wait.until(EC.presence_of_all_elements_located)
+        juyo_button = self.driver.find_element(By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")
+        juyo_button.click()
+
+        #If「もっと表示」button, click
+        self.wait.until(EC.presence_of_all_elements_located)
+        motto_button = check_exists_by_xpath(driver=self.driver,xpath="/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/div/div[2]/a")
+        if motto_button:
+            motto_button.click()
+        
+        #Click the assignment to submit        
+        #Taking out the time.sleep() in the future
+        self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-datalist-item")))
+        time.sleep(3)
+        assignment_btn = self.driver.find_element(By.ID,id)
+        assignment_btn.click()
+        #time.sleep(100)
+
+        #Submitting the assignment
+        submission_box = self.driver.find_element(By.ID,"funcForm:kdiTstAccordion:j_idt430:fileUpload1_input")
+        submit_btn = self.driver.find_element(By.ID,"funcForm:j_idt500")
+        confirm_yes_btn = self.driver.find_element(By.ID,"yes")
+
+        submission_box.send_keys(file_path)
+        time.sleep(3)
+        submit_btn.click()
+        time.sleep(1)
+        confirm_yes_btn.click()
+
+        time.sleep(60)
+
+
+
+
+
+
+
+
+
