@@ -16,9 +16,7 @@ Tbd
 
 
 ## Installation
-'''
-pip install requirements.txt
-'''
+``` pip install requirements.txt ```
 
 ## Usage
 
