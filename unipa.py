@@ -102,6 +102,12 @@ class UNIPA_Login():
 
         self.driver.close()
         return assignment_list
+    
+    def __enter__(self):
+        pass
+
+    def __exit__(self,ex_type,ex_value,trace):
+        pass
 
 class UNIPA_Submit(UNIPA_Login):
 
