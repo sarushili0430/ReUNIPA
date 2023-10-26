@@ -7,12 +7,28 @@ from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from dotenv import load_dotenv
-
-from datetime import datetime
+from pywifi import const
+import pywifi
 import time
 import os
 
 load_dotenv()
+
+#wifi settings
+wifi = pywifi.PyWiFi()
+iface = wifi.interfaces()[0]
+Name = iface.name()
+
+#profie
+profile = pywifi.Profile()
+profile.ssid = "kuas-wifi"
+profile.auth = const.AUTH_ALG_OPEN
+profile.akm.append(const.AKM_TYPE_NONE)
+profile.cipher = const.CIPHER_TYPE_NONE
+profile.key = "Kyotosentan2019"
+
+profile = iface.add_network_profile(profile)
+iface.connect(profile)
 
 #chromedriverのパスを下で指定してください
 #ex) "/Users/xxx/xxxx/chromedriver.exe"
@@ -35,7 +51,8 @@ print(os.environ["UNIPA_ID"])
 print(os.environ["UNIPA_PWD"])
 
 
-driver.get("")
+
+driver.get(os.environ["WIFI_URL"])
 wait = WebDriverWait(driver=driver,timeout=30)
 wait.until(EC.presence_of_element_located((By.NAME,"user")))
 username = driver.find_element(By.NAME,"user")
