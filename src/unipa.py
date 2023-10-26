@@ -42,7 +42,7 @@ options.add_experimental_option('useAutomationExtension', False)
 options.page_load_strategy = 'eager'
 options.add_argument('--disable-extensions')
 options.add_argument("--start-maximized")
-#options.add_argument("--headless")
+options.add_argument("--headless")
 
 
 
@@ -88,18 +88,17 @@ class UNIPA_Login():
         self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-datalist-item")))
         time.sleep(3)
 
-        notify = self.driver.find_elements(By.CLASS_NAME,"ui-datalist-item")
+        notify = self.driver.find_element(By.ID,"funcForm:j_idt162:j_idt211_list").find_elements(By.CLASS_NAME,"ui-datalist-item")
         cnt = 0
         for _ in notify:
             try:
                 assignment_id = "funcForm:j_idt162:j_idt211:"+str(cnt)+":j_idt232"
                 assignment_name = _.find_element(By.ID,"funcForm:j_idt162:j_idt211:"+str(cnt)+":j_idt232").get_attribute("textContent")
                 assignment_deadline = _.find_elements(By.CSS_SELECTOR,"span.textDate")[1].get_attribute("textContent")
-                cnt += 1
                 assignment_list.append([assignment_id,assignment_name,assignment_deadline])
             except:
                 pass
-
+            cnt += 1
         self.driver.close()
         return assignment_list
 
