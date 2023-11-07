@@ -148,7 +148,7 @@ class UNIPA_Submit(UNIPA_Login):
     
     def submit_assignment(self,id,file_path):
         #Getting the assignment information
-        self.wait.until(EC.presence_of_all_elements_located)
+        self.wait.until(EC.presence_of_all_elements_located((By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")))
         juyo_button = self.driver.find_element(By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")
         juyo_button.click()
 
@@ -176,8 +176,13 @@ class UNIPA_Submit(UNIPA_Login):
         submit_btn.click()
         time.sleep(1)
         confirm_yes_btn.click()
-
-        time.sleep(60)
+        time.sleep(1)
+        
+        #Check whether the assignment is submitted or not
+        if EC.presence_of_element_located((By.CSS_SELECTOR,"div.ui-growl-item-container.ui-state-highlight.ui-corner-all.ui-helper-hidden.ui-shadow")):
+            return True
+        else:
+            return False
 
 
 
