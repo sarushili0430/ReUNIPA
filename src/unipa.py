@@ -19,6 +19,9 @@ load_dotenv()
 #ex) "/Users/xxx/xxxx/chromedriver.exe"
 CHROMEDRIVER = "chromedriver.exe"
 SIGNINURL = os.environ["UNIPA_URL"]
+USERID = os.environ["UNIPA_ID"]
+USERPWD = os.environ["UNIPA_PWD"]
+EMPTY = "EMPTY"
 
 #Setting up the selenium browser
 chrome_service = service.Service(executable_path=CHROMEDRIVER)
@@ -41,7 +44,7 @@ options.add_experimental_option('useAutomationExtension', False)
 options.page_load_strategy = 'eager'
 options.add_argument('--disable-extensions')
 options.add_argument("--start-maximized")
-options.add_argument("--headless")
+#options.add_argument("--headless")
 
 
 
@@ -56,6 +59,12 @@ class UNIPA_Login():
         self.wait = WebDriverWait(self.driver,timeout=30)
         self.driver.get(SIGNINURL)
         self.login()
+
+    def __enter__(self):
+        return self
+    
+    def __exit__(self,exception_type, exception_value, traceback):
+        self.driver.close()
 
     def login(self):
         #Login to account
@@ -87,6 +96,9 @@ class UNIPA_Login():
         self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-datalist-item")))
         time.sleep(3)
 
+        if EC.presence_of_element_located((By.CLASS_NAME,"ui-datalist-empty-message")):
+            return EMPTY
+        
         notify = self.driver.find_element(By.ID,"funcForm:j_idt162:j_idt211_list").find_elements(By.CLASS_NAME,"ui-datalist-item")
         cnt = 0
         for _ in notify:
@@ -105,7 +117,6 @@ class UNIPA_Login():
             print(content)
             self.assignment_list[_].append(content)
             
-        self.driver.close()
         return self.assignment_list
     
     def get_assignment_detail(self,id):
@@ -135,8 +146,6 @@ class UNIPA_Login():
     
         return content
         
-        
-
 
 class UNIPA_Submit(UNIPA_Login):
 
@@ -145,6 +154,12 @@ class UNIPA_Submit(UNIPA_Login):
         #Opening the Chrome browser
         #self.driver = webdriver.Chrome(service=chrome_service,options=options)
         #self.wait = WebDriverWait(self.driver,timeout=30)
+
+    def __enter__(self):
+        return self.driver
+    
+    def __exit__(self):
+        self.driver.close()
     
     def submit_assignment(self,id,file_path):
         #Getting the assignment information
@@ -183,6 +198,16 @@ class UNIPA_Submit(UNIPA_Login):
             return True
         else:
             return False
+        
+
+#Test
+if __name__ == "__main__":
+    with UNIPA_Login(USERID,USERPWD) as client:
+        print(client.get_assignment())
+
+    with UNIPA_Login(USERID,USERPWD) as client:
+        print(client.get_assignment())
+    
 
 
 
