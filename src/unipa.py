@@ -199,6 +199,21 @@ class UNIPA_Submit(UNIPA_Login):
         else:
             return False
         
+def check_id(id,pwd,url):
+        #Login to account
+        driver = webdriver.Chrome(service=chrome_service,options=options)
+        driver.get(url=url)
+        username_input = driver.find_element(By.ID,"loginForm:userId")
+        pwd_input = driver.find_element(By.ID,"loginForm:password")
+        login_btn = driver.find_element(By.ID,"loginForm:loginButton")
+        username_input.send_keys(id)
+        pwd_input.send_keys(pwd)
+        login_btn.click()
+        if EC.presence_of_element_located((By.CLASS_NAME,"ui-messages-error")):
+            print("ERROR")
+        else:
+            print("SUCCESS")
+
 
 #Test
 if __name__ == "__main__":
@@ -208,7 +223,6 @@ if __name__ == "__main__":
     with UNIPA_Login(USERID,USERPWD) as client:
         print(client.get_assignment())
     
-
 
 
 
