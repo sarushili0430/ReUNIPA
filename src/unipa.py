@@ -194,7 +194,7 @@ class UNIPA_Submit(UNIPA_Login):
         time.sleep(1)
         
         #Check whether the assignment is submitted or not
-        if EC.presence_of_element_located((By.CSS_SELECTOR,"div.ui-growl-item-container.ui-state-highlight.ui-corner-all.ui-helper-hidden.ui-shadow")):
+        if self.driver.find_elements(By.CSS_SELECTOR,"div.ui-growl-item-container.ui-state-highlight.ui-corner-all.ui-helper-hidden.ui-shadow"):
             return True
         else:
             return False
@@ -209,10 +209,12 @@ def check_id(id,pwd,url):
         username_input.send_keys(id)
         pwd_input.send_keys(pwd)
         login_btn.click()
-        if EC.presence_of_element_located((By.CLASS_NAME,"ui-messages-error")):
-            print("ERROR")
+        if driver.find_elements(By.CLASS_NAME,"ui-messages-error"):
+            driver.close()
+            return "ERROR"
         else:
-            print("SUCCESS")
+            driver.close()
+            return "SUCCESS"
 
 
 #Test
