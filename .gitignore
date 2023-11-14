@@ -163,3 +163,5 @@ cython_debug/
 #Ignore Chromedriver (Get the latest version from https://chromedriver.chromium.org/downloads)
 chromedriver.exe
 appdemo.py
+apptest.py
+viewtest.py

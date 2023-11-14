@@ -16,6 +16,7 @@ TEAMS_PWD = os.environ["TEAMS_PWD"]
 
 a = UNIPA_Login(UNIPA_ID, UNIPA_PWD)
 assignments = a.get_assignment()
+print(assignments)
 ReUNIPA_App = app.AppMain(assignments=assignments)
 print(assignments)
 ft.app(target=ReUNIPA_App.app_main)
