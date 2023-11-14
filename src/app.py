@@ -143,7 +143,6 @@ class AppMain():
         page.add(ft.Column([header,body]))
 
 
-
 def main(page: ft.Page):
 
     header = AppHeader(page)
