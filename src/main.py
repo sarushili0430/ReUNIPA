@@ -1,7 +1,8 @@
-import flet as ft
+from concurrent.futures import ThreadPoolExecutor
 from view import views_handler
 from dotenv import load_dotenv
-from unipa import UNIPA_Login
+from unipa import check_id
+import flet as ft
 import os
 
 load_dotenv()
@@ -15,9 +16,14 @@ def main(page: ft.Page):
     def route_change(route):
         assignments = []
         print(page.route)
-        if page.route == "/":
-            assignments = UNIPA_Login(UNIPA_ID,UNIPA_PWD)
-            assignments = assignments.get_assignment()
+        #if page.route == "/":
+            #page.snack_bar = ft.SnackBar(
+            #    content=ft.Text("Login Successful")
+            #)
+            #page.snack_bar.open = True
+            #page.update()
+            #assignments = UNIPA_Login(UNIPA_ID,UNIPA_PWD)
+            #assignments = assignments.get_assignment()
         page.views.clear()
         page.views.append(
             views_handler(page,assignments=assignments)[page.route]
@@ -30,9 +36,12 @@ def main(page: ft.Page):
 
     #View handling
     page.on_route_change = route_change
-    if UNIPA_URL == "" or UNIPA_ID == "" or UNIPA_PWD == "":
+    if check_id(id=UNIPA_ID,pwd=UNIPA_PWD,url=UNIPA_URL) == "ERROR":
         page.go("/login")
     else:
         page.go("/")
+        page.snack_bar = ft.SnackBar(content=ft.Text("Login Successful"),duration=2000)
+        page.snack_bar.open = True
+        page.update()
 
 ft.app(target=main)
