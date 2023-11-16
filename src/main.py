@@ -1,28 +1,42 @@
-#import login
-from unipa import UNIPA_Login
-from unipa import UNIPA_Submit
+from concurrent.futures import ThreadPoolExecutor
+from view import views_handler
 from dotenv import load_dotenv
+from unipa import check_id
 import flet as ft
-import app
-
 import os
 
 load_dotenv()
 
+UNIPA_URL = os.environ["UNIPA_URL"]
 UNIPA_ID = os.environ["UNIPA_ID"]   
 UNIPA_PWD = os.environ["UNIPA_PWD"]
-TEAMS_ID = os.environ["TEAMS_ID"]
-TEAMS_PWD = os.environ["TEAMS_PWD"]
 
-a = UNIPA_Login(UNIPA_ID, UNIPA_PWD)
-assignments = a.get_assignment()
-print(assignments)
-ReUNIPA_App = app.AppMain(assignments=assignments)
-print(assignments)
-ft.app(target=ReUNIPA_App.app_main)
-#b = UNIPA_Submit(UNIPA_ID,UNIPA_PWD)
-#b.submit_assignment(id=assignments[0][0],file_path="")
+def main(page: ft.Page):
 
-#b = login.Teams_Login(TEAMS_ID, TEAMS_PWD)
-#b.login()
-#print(assignments)
+    def route_change(route):
+        assignments = []
+        print(page.route)
+        page.views.clear()
+        page.views.append(
+            views_handler(page,assignments=assignments)[page.route]
+        )
+    
+    page.title = "ReUNIPA"
+    page.scroll = "ADAPTIVE"
+    page.window_width = 896
+    page.window_height = 504
+    #View handling
+    page.on_route_change = route_change
+    #On initial state    
+    page.go("/home")
+
+
+    if check_id(id=UNIPA_ID,pwd=UNIPA_PWD,url=UNIPA_URL) == "ERROR":
+        page.go("/login")
+    else:
+        page.go("/")
+        page.snack_bar = ft.SnackBar(content=ft.Text("Login Successful"),duration=2000)
+        page.snack_bar.open = True
+        page.update()
+
+ft.app(target=main)

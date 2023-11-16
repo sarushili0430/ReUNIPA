@@ -200,21 +200,25 @@ class UNIPA_Submit(UNIPA_Login):
             return False
         
 def check_id(id,pwd,url):
-        #Login to account
-        driver = webdriver.Chrome(service=chrome_service,options=options)
-        driver.get(url=url)
-        username_input = driver.find_element(By.ID,"loginForm:userId")
-        pwd_input = driver.find_element(By.ID,"loginForm:password")
-        login_btn = driver.find_element(By.ID,"loginForm:loginButton")
-        username_input.send_keys(id)
-        pwd_input.send_keys(pwd)
-        login_btn.click()
-        if driver.find_elements(By.CLASS_NAME,"ui-messages-error"):
-            driver.close()
+        try:
+            #Login to account
+            driver = webdriver.Chrome(service=chrome_service,options=options)
+            driver.get(url=url)
+            username_input = driver.find_element(By.ID,"loginForm:userId")
+            pwd_input = driver.find_element(By.ID,"loginForm:password")
+            login_btn = driver.find_element(By.ID,"loginForm:loginButton")
+            username_input.send_keys(id)
+            pwd_input.send_keys(pwd)
+            login_btn.click()
+            if driver.find_elements(By.CLASS_NAME,"ui-messages-error"):
+                driver.close()
+                return "ERROR"
+            else:
+                driver.close()
+                return "SUCCESS"
+        except Exception as e:
+            print(e)
             return "ERROR"
-        else:
-            driver.close()
-            return "SUCCESS"
 
 
 #Test
