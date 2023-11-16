@@ -16,14 +16,6 @@ def main(page: ft.Page):
     def route_change(route):
         assignments = []
         print(page.route)
-        #if page.route == "/":
-            #page.snack_bar = ft.SnackBar(
-            #    content=ft.Text("Login Successful")
-            #)
-            #page.snack_bar.open = True
-            #page.update()
-            #assignments = UNIPA_Login(UNIPA_ID,UNIPA_PWD)
-            #assignments = assignments.get_assignment()
         page.views.clear()
         page.views.append(
             views_handler(page,assignments=assignments)[page.route]
@@ -33,9 +25,12 @@ def main(page: ft.Page):
     page.scroll = "ADAPTIVE"
     page.window_width = 896
     page.window_height = 504
-
     #View handling
     page.on_route_change = route_change
+    #On initial state    
+    page.go("/home")
+
+
     if check_id(id=UNIPA_ID,pwd=UNIPA_PWD,url=UNIPA_URL) == "ERROR":
         page.go("/login")
     else:
