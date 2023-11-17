@@ -6,12 +6,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium_tools import check_exists_by_xpath
+from tools import check_exists_by_xpath
 from dotenv import load_dotenv
 
 from datetime import datetime
 import time
 import os
+import dotenv
 
 load_dotenv()
 
@@ -96,9 +97,6 @@ class UNIPA_Login():
         self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-datalist-item")))
         time.sleep(3)
 
-        if self.driver.find_elements(By.CLASS_NAME,"ui-datalist-empty-message"):
-            return EMPTY
-        
         notify = self.driver.find_element(By.ID,"funcForm:j_idt162:j_idt211_list").find_elements(By.CLASS_NAME,"ui-datalist-item")
         cnt = 0
         for _ in notify:
@@ -215,6 +213,13 @@ def check_id(id,pwd,url):
                 return "ERROR"
             else:
                 driver.close()
+                dotenv_file = dotenv.find_dotenv()
+                dotenv.set_key(dotenv_path=dotenv_file,key_to_set="UNIPA_URL",value_to_set=url)
+                dotenv.set_key(dotenv_path=dotenv_file,key_to_set="UNIPA_ID",value_to_set=id)
+                dotenv.set_key(dotenv_path=dotenv_file,key_to_set="UNIPA_PWD",value_to_set=pwd)
+                os.environ["UNIPA_URL"] = url 
+                os.environ["UNIPA_ID"] = id 
+                os.environ["UNIPA_PWD"] = pwd
                 return "SUCCESS"
         except Exception as e:
             print(e)

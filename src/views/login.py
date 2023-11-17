@@ -43,16 +43,14 @@ class LoginView(ft.UserControl):
         self.prog_ring.visible = True
         self.update()
 
+        check_result = check_id(id=self.username.value,pwd=self.pwd.value,url=self.unipa_url.value)
+
         #Check whether id is available or not
-        if check_id(id=self.username.value,pwd=self.pwd.value,url=self.unipa_url.value) == "SUCCESS":
+        if check_result == "SUCCESS":
+            #Enable submit button
             print("SUCCESS")
-            dotenv_file = dotenv.find_dotenv()
-            dotenv.set_key(dotenv_path=dotenv_file,key_to_set="UNIPA_URL",value_to_set=self.unipa_url.value)
-            dotenv.set_key(dotenv_path=dotenv_file,key_to_set="UNIPA_ID",value_to_set=self.username.value)
-            dotenv.set_key(dotenv_path=dotenv_file,key_to_set="UNIPA_PWD",value_to_set=self.pwd.value)
             self.page.go("/")
         else:
-            #Enable submit button
             self.submit.disabled = False
             self.prog_ring.visible = False
             self.update()
