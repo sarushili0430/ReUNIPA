@@ -36,7 +36,7 @@ class HomeView(ft.UserControl):
             height = 60,
             text_align="Center",
             font_family = "Inter",
-            size = 40
+            size = 40,
         )
         self.header = ft.Container(
             ft.Row(
@@ -45,6 +45,7 @@ class HomeView(ft.UserControl):
                     self.assignment_name,
                 ],
             ),
+
             padding=20,
         )
         #Body Components
@@ -69,14 +70,19 @@ class HomeView(ft.UserControl):
             size=15,
             max_lines=100,
         )
-        self.assignment_submition = ft.Row(
-            [
-                ft.ElevatedButton(text="Pick Files",
-                                  icon=ft.icons.UPLOAD_FILE,
-                                  on_click=lambda x: self.pickfile.pick_files(allow_multiple=False)
-                ),
-                ft.TextButton(text="Submit",on_click=self.assignment_submit_clicked)
-            ]
+        self.pickfile_btn = ft.ElevatedButton(text="Pick Files",
+                                icon=ft.icons.UPLOAD_FILE,
+                                on_click=lambda x: self.pickfile.pick_files(allow_multiple=False)
+                )
+        self.file_submit_btn = ft.TextButton(text="Submit",on_click=self.assignment_submit_clicked,disabled=True)
+        self.assignment_submition = ft.Container(
+            ft.Row(
+                [
+                    self.pickfile_btn,
+                    self.file_submit_btn,
+                ]
+            ),
+            padding = ft.padding.symmetric(horizontal=20)
         )
         self.body = ft.Container(
             ft.Row(
@@ -89,7 +95,7 @@ class HomeView(ft.UserControl):
                         ]
                     )
                 ]
-            )
+            ),
         )
         self.page.snack_bar = ft.SnackBar(
                 content=ft.Text("Submit Successful")
@@ -100,11 +106,15 @@ class HomeView(ft.UserControl):
         print(self.assignment_name.value)
         self.update()
         print(self.assignment_name.value)
-        
 
     def assignment_file_selected(self, e:ft.FilePickerResultEvent):
-        self.assignment_path = e.files[0].path
-        print(self.assignment_path)
+        try:
+            self.assignment_path = e.files[0].path
+            self.file_submit_btn.disabled = False
+            self.update()
+            print(self.assignment_path)
+        except Exception as e:
+            print(e)
 
     def assignment_submit_clicked(self,e):
         SUBMISSION = UNIPA_Submit(UNIPA_ID,UNIPA_PWD)

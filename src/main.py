@@ -32,6 +32,7 @@ def main(page: ft.Page):
     page.scroll = "ADAPTIVE"
     page.window_width = 896
     page.window_height = 504
+    page.window_visible = True
     #View handling
     page.on_route_change = route_change
     #On initial state    
@@ -51,4 +52,4 @@ def main(page: ft.Page):
         page.snack_bar.open = True
         page.update()
 
-ft.app(target=main)
+ft.app(target=main, view=ft.AppView.FLET_APP_HIDDEN)
