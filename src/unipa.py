@@ -6,12 +6,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium_tools import check_exists_by_xpath
+from tools import check_exists_by_xpath
 from dotenv import load_dotenv
 
 from datetime import datetime
 import time
 import os
+import dotenv
 
 load_dotenv()
 
@@ -81,42 +82,43 @@ class UNIPA_Login():
             Args:
                 assignment_list: List of the assignment names and deadlines
         """
-        #Getting the assignment information
-        self.wait.until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")))
-        juyo_button = self.driver.find_element(By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")
-        juyo_button.click()
+        try:
+            #Getting the assignment information
+            self.wait.until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")))
+            juyo_button = self.driver.find_element(By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")
+            juyo_button.click()
 
-        #If「もっと表示」button, click
-        self.wait.until(EC.presence_of_all_elements_located)
-        motto_button = check_exists_by_xpath(driver=self.driver,xpath="/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/div/div[2]/a")
-        if motto_button:
-            motto_button.click()
-        
-        #Taking out the time.sleep() in the future
-        self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-datalist-item")))
-        time.sleep(3)
-
-        if self.driver.find_elements(By.CLASS_NAME,"ui-datalist-empty-message"):
-            return EMPTY
-        
-        notify = self.driver.find_element(By.ID,"funcForm:j_idt162:j_idt211_list").find_elements(By.CLASS_NAME,"ui-datalist-item")
-        cnt = 0
-        for _ in notify:
-            try:
-                assignment_id = "funcForm:j_idt162:j_idt211:"+str(cnt)+":j_idt232"
-                assignment_name = _.find_element(By.ID,"funcForm:j_idt162:j_idt211:"+str(cnt)+":j_idt232").get_attribute("textContent")
-                assignment_deadline = _.find_elements(By.CSS_SELECTOR,"span.textDate")[1].get_attribute("textContent")
-                self.assignment_list.append([assignment_id,assignment_name,assignment_deadline])
-            except:
-                pass
-            cnt += 1
-        
-        for _ in range(len(self.assignment_list)):
-            content = self.get_assignment_detail(self.assignment_list[_][0])
-            print(_)
-            print(content)
-            self.assignment_list[_].append(content)
+            #If「もっと表示」button, click
+            self.wait.until(EC.presence_of_all_elements_located)
+            motto_button = check_exists_by_xpath(driver=self.driver,xpath="/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/div/div[2]/a")
+            if motto_button:
+                motto_button.click()
             
+            #Taking out the time.sleep() in the future
+            self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-datalist-item")))
+            time.sleep(3)
+
+            notify = self.driver.find_element(By.ID,"funcForm:j_idt162:j_idt211_list").find_elements(By.CLASS_NAME,"ui-datalist-item")
+            cnt = 0
+            for _ in notify:
+                try:
+                    assignment_id = "funcForm:j_idt162:j_idt211:"+str(cnt)+":j_idt232"
+                    assignment_name = _.find_element(By.ID,"funcForm:j_idt162:j_idt211:"+str(cnt)+":j_idt232").get_attribute("textContent")
+                    assignment_deadline = _.find_elements(By.CSS_SELECTOR,"span.textDate")[1].get_attribute("textContent")
+                    self.assignment_list.append([assignment_id,assignment_name,assignment_deadline])
+                except:
+                    pass
+                cnt += 1
+            
+            for _ in range(len(self.assignment_list)):
+                content = self.get_assignment_detail(self.assignment_list[_][0])
+                print(_)
+                print(content)
+                self.assignment_list[_].append(content)
+        except Exception as e:
+            print(e)
+            self.assignment_list = []
+
         return self.assignment_list
     
     def get_assignment_detail(self,id):
@@ -215,6 +217,13 @@ def check_id(id,pwd,url):
                 return "ERROR"
             else:
                 driver.close()
+                dotenv_file = dotenv.find_dotenv()
+                dotenv.set_key(dotenv_path=dotenv_file,key_to_set="UNIPA_URL",value_to_set=url)
+                dotenv.set_key(dotenv_path=dotenv_file,key_to_set="UNIPA_ID",value_to_set=id)
+                dotenv.set_key(dotenv_path=dotenv_file,key_to_set="UNIPA_PWD",value_to_set=pwd)
+                os.environ["UNIPA_URL"] = url 
+                os.environ["UNIPA_ID"] = id 
+                os.environ["UNIPA_PWD"] = pwd
                 return "SUCCESS"
         except Exception as e:
             print(e)

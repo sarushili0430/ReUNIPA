@@ -19,6 +19,8 @@ load_dotenv()
 #ex) "/Users/xxx/xxxx/chromedriver.exe"
 CHROMEDRIVER = "chromedriver.exe"
 SIGNINURL = os.environ["UNIPA_URL"]
+TEAMS_ID = os.environ["UNIPA_ID"]+"@kuas.ac.jp"
+TEAMS_PWD = os.environ["UNIPA_PWD"]
 
 #Setting up the selenium browser
 chrome_service = service.Service(executable_path=CHROMEDRIVER)
@@ -42,7 +44,7 @@ options.add_experimental_option('useAutomationExtension', False)
 options.page_load_strategy = 'eager'
 options.add_argument('--disable-extensions')
 options.add_argument("--start-maximized")
-#options.add_argument("--headless")
+options.add_argument("--headless")
 
 
 class Teams_Login():
@@ -74,3 +76,8 @@ class Teams_Login():
         time.sleep(100)
         #login_btn = self.driver.find_element(By.ID,"idSIButton9")
         #self.wait.until(EC.staleness_of(login_btn))
+
+
+if __name__ == "__main__":
+    a = Teams_Login(TEAMS_ID,TEAMS_PWD)
+    a.login()

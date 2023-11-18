@@ -2,7 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 
-
 def check_exists_by_xpath(driver,xpath):
     try:
         element = driver.find_element(By.XPATH,xpath)
@@ -10,3 +9,8 @@ def check_exists_by_xpath(driver,xpath):
         return False
     return element
     
+def list_to_dict(ls:list):
+    assign_dict = {}
+    for _ in ls:
+        assign_dict[_[1]] = _[0]
+    return assign_dict
