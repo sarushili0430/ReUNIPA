@@ -12,15 +12,13 @@ Tbd
 ## Requirement
 * 自分のブラウザに合ったバージョンのWebDriver  
 * Selenium 4.14.0
-* Customtkinter 5.2.0
-
+* Flet
 
 ## Installation
-``` pip install requirements.txt ```
+``` pip install -f requirements.txt ```
 
 ## Usage
 
 ### ID, Password
 
 .env_example をコピーし，.env にリネームしてください．
-全ての KEY の値を埋めてください．
