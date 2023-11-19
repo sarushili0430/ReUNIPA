@@ -8,17 +8,18 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from tools import check_exists_by_xpath
 from dotenv import load_dotenv
-
-from datetime import datetime
 import time
 import os
 import dotenv
+import sys
 
 load_dotenv()
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 #chromedriverのパスを下で指定してください
 #ex) "/Users/xxx/xxxx/chromedriver.exe"
 CHROMEDRIVER = "chromedriver.exe"
+DOWNLOAD_DIR = "../downloads"
 SIGNINURL = os.environ["UNIPA_URL"]
 USERID = os.environ["UNIPA_ID"]
 USERPWD = os.environ["UNIPA_PWD"]
@@ -29,8 +30,9 @@ chrome_service = service.Service(executable_path=CHROMEDRIVER)
 
 #Options for the Chrome Browser
 options = Options()
-options.add_argument(f'service={chrome_service}')
-options.page_load_strategy = 'eager'                     
+options.page_load_strategy = 'eager'
+options.enable_downloads = True      
+options.add_argument(f'service={chrome_service}')          
 options.add_argument('--disable-gpu')                      
 options.add_argument('--disable-extensions')               
 options.add_argument('--proxy-server="direct://"')         
@@ -42,12 +44,8 @@ options.add_argument("--log-level=3")
 options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36')
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.add_experimental_option('useAutomationExtension', False)
-options.page_load_strategy = 'eager'
-options.add_argument('--disable-extensions')
 options.add_argument("--start-maximized")
-options.add_argument("--headless")
-
-
+options.add_argument("--headless=new")
 
 class UNIPA_Login():
 
@@ -130,6 +128,7 @@ class UNIPA_Login():
             self.wait.until(EC.presence_of_all_elements_located)
             content = self.driver.find_element(By.CSS_SELECTOR,"div.fr-box.fr-view").get_attribute("textContent")
             self.wait.until(EC.presence_of_element_located((By.ID,"headerForm:j_idt54")))
+            #self.get_assignment_file()
             home_btn = self.driver.find_element(By.ID,"headerForm:j_idt54")
             home_btn.click()
 
@@ -147,15 +146,42 @@ class UNIPA_Login():
             raise e
     
         return content
+    
+    def get_assignment_file(self):
+        #Checks whether there's any file to download
+        try:
+            self.wait.until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[2]/div[1]/table/tbody/tr[2]/td[2]")))
+            look_file_btn = self.driver.find_element(By.ID,"funcForm:kdiTstAccordion:j_idt382")
+            look_file_btn.click()
+        except:
+            return "NO_FILE"
+
+        try:
+            cnt = 0
+            assignment_file_name = []
+            self.wait.until(EC.presence_of_element_located((By.ID,"pkx02201:ch:appendList:0:j_idt588")))
+
+            #Check all file names
+            for _ in self.driver.find_elements(By.CSS_SELECTOR,"div.fileListCell.downLoadCellFilNm"):
+                assignment_file_name.append(_.get_attribute("textContent"))
+
+            #Download all files available
+            while True:
+                download_btn = self.driver.find_element(By.ID,"pkx02201:ch:appendList:"+str(cnt)+":j_idt588")
+                download_btn.click()
+                cnt += 1
+        except:
+            pass
+        
+    def make_dir_assignment_file(self,name):
+        os.mkdir(path=DOWNLOAD_DIR+"/"+name)
+        pass
         
 
 class UNIPA_Submit(UNIPA_Login):
 
     def __init__(self, ID, PWD):
         super().__init__(ID, PWD)
-        #Opening the Chrome browser
-        #self.driver = webdriver.Chrome(service=chrome_service,options=options)
-        #self.wait = WebDriverWait(self.driver,timeout=30)
 
     def __enter__(self):
         return self.driver
