@@ -50,9 +50,15 @@ class HomeView(ft.UserControl):
         )
         #Body Components
         self.assignment_path = None
-        self.assignments = list_to_dict(assignments)
+        self.retry_get_assignment_btn = ft.ElevatedButton(icon=ft.icons.REFRESH)
         self.lv = ft.ListView(expand=1.0,spacing=20,padding=20)
-        for _ in range(len(self.assignments)): self.lv.controls.append(ft.TextButton(text=assignments[_][1],on_click=self.assignment_clicked,data=[assignments[_][1],assignments[_][3]]))
+        if assignments == []:
+            pass
+        elif assignments == None:
+            self.lv.controls.append(self.retry_get_assignment_btn)
+        else:
+            self.assignments = list_to_dict(assignments)
+            for _ in range(len(self.assignments)): self.lv.controls.append(ft.TextButton(text=assignments[_][1],on_click=self.assignment_clicked,data=[assignments[_][1],assignments[_][3]]))
         self.assignment_list = ft.Container(
             self.lv,
             width=160,
@@ -117,9 +123,10 @@ class HomeView(ft.UserControl):
             print(e)
 
     def assignment_submit_clicked(self,e):
-        SUBMISSION = UNIPA_Submit(UNIPA_ID,UNIPA_PWD)
-        result = SUBMISSION.submit_assignment(id=self.assignments[self.assignment_name.value],file_path=self.assignment_path)
+        with UNIPA_Submit(UNIPA_ID,UNIPA_PWD) as client:
+            result = client.submit_assignment(id=self.assignments[self.assignment_name.value],file_path=self.assignment_path)
         if result == True:
+            self.page.snack_bar.content = ft.Text("Submit Success")
             self.page.snack_bar.open = True
             self.page.update()
         else:
