@@ -48,9 +48,12 @@ class HomeView(ft.UserControl):
 
             padding=20,
         )
+
         #Body Components
+
+        #Handling the assignment list
         self.assignment_path = None
-        self.retry_get_assignment_btn = ft.ElevatedButton(icon=ft.icons.REFRESH)
+        self.retry_get_assignment_btn = ft.IconButton(icon=ft.icons.REFRESH)
         self.lv = ft.ListView(expand=1.0,spacing=20,padding=20)
         if assignments == []:
             pass
@@ -64,6 +67,7 @@ class HomeView(ft.UserControl):
             width=160,
             height=304,
         )
+
         self.pickfile = ft.FilePicker(on_result=self.assignment_file_selected)
         self.page.controls.append(self.pickfile)
         self.page.overlay.append(self.pickfile)
@@ -135,6 +139,10 @@ class HomeView(ft.UserControl):
             self.page.snack_bar.open = True
             self.page.update()
         print("Submission result: "+str(result))
+
+    def refresh_assignment_list(self, e):
+        with UNIPA_Login(UNIPA_ID,UNIPA_PWD) as client:
+            self.assi
     
     def assignment_clicked(self, e):
         self.change_assignment_name(name=e.control.data[0])
