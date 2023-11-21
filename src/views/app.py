@@ -130,6 +130,7 @@ class HomeView(ft.UserControl):
             self.page.snack_bar.content = ft.Text("Submit Success")
             self.page.snack_bar.open = True
             self.page.update()
+            self.refresh_assignment_list()
         else:
             self.page.snack_bar.content = ft.Text("Submit failed")
             self.page.snack_bar.bgcolor = "#F94C10"
@@ -143,17 +144,21 @@ class HomeView(ft.UserControl):
         self.update()
         print(self.assignment_name)
     
-    def refresh_assignment_list(self, e):
+    def refresh_assignment_list(self, e=None):
         new_assignment_list = []
         try:
             with UNIPA_Login(UNIPA_ID,UNIPA_PWD) as client:
                 new_assignment_list = client.get_assignment()
             self.lv.clean()
-            for _ in range(len(self.assignments)): self.lv.controls.append(ft.TextButton(text=new_assignment_list[_][1],on_click=self.assignment_clicked,data=[new_assignment_list[_][1],new_assignment_list[_][3]]))
             self.assignments = list_to_dict(new_assignment_list)
-        except:
+            for _ in range(len(self.assignments)): self.lv.controls.append(ft.TextButton(text=new_assignment_list[_][1],on_click=self.assignment_clicked,data=[new_assignment_list[_][1],new_assignment_list[_][3]]))
+            print(new_assignment_list)
+            print("go to listtodict")
+        except Exception as e:
+            print(e)
             self.lv.clean()
             self.lv.controls.append(self.retry_get_assignment_btn)
+        self.update()
 
     def build(self):
         return ft.Column([self.header,self.body])

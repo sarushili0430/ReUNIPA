@@ -65,6 +65,7 @@ class UNIPA_Login():
 
     def get_assignment(self):
         """Gets the assignment information from UNIPA
+        
         Returns:
             list: List of the assignment names and deadlines
         """
@@ -192,7 +193,6 @@ class UNIPA_Submit(UNIPA_Login):
             submission_box = self.driver.find_element(By.ID,"funcForm:kdiTstAccordion:j_idt430:fileUpload1_input")
             submit_btn = self.driver.find_element(By.ID,"funcForm:j_idt500")
             confirm_yes_btn = self.driver.find_element(By.ID,"yes")
-
             time.sleep(5)
             submission_box.send_keys(file_path)
             self.wait.until(EC.presence_of_element_located((By.ID,"funcForm:kdiTstAccordion:j_idt433:j_idt434:0:j_idt437")))
@@ -203,6 +203,7 @@ class UNIPA_Submit(UNIPA_Login):
             #time.sleep(10)
             self.wait.until(EC.presence_of_element_located((By.ID,"funcForm:j_idt496")))
             print("completed")
+
             return True
         except Exception as e:
             print(e)
