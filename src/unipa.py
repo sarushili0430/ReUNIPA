@@ -43,7 +43,7 @@ options.add_experimental_option('useAutomationExtension', False)
 options.page_load_strategy = 'eager'
 options.add_argument('--disable-extensions')
 options.add_argument("--start-maximized")
-options.add_argument("--headless")
+options.add_argument("--headless=new")
 
 
 class UNIPA_Login():
@@ -55,8 +55,7 @@ class UNIPA_Login():
         #Opening the Chrome browser
         self.driver = webdriver.Chrome(service=chrome_service,options=options)
         self.wait = WebDriverWait(self.driver,timeout=30)
-        self.driver.get(SIGNINURL)
-        self.login()
+        login(self.driver,id=ID,pwd=PWD,url=SIGNINURL,wait=self.wait)
 
     def __enter__(self):
         return self
@@ -64,32 +63,17 @@ class UNIPA_Login():
     def __exit__(self,exception_type, exception_value, traceback):
         self.driver.close()
 
-    def login(self):
-        #Login to account
-        self.wait.until(EC.presence_of_all_elements_located)
-        username_input = self.driver.find_element(By.ID,"loginForm:userId")
-        pwd_input = self.driver.find_element(By.ID,"loginForm:password")
-        login_btn = self.driver.find_element(By.ID,"loginForm:loginButton")
-        username_input.send_keys(self.id)
-        pwd_input.send_keys(self.pwd)
-        login_btn.click()
-
     def get_assignment(self):
         """Gets the assignment information from UNIPA
         Returns:
             list: List of the assignment names and deadlines
         """
         try:
-            #Getting the assignment information
-            self.wait.until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")))
-            juyo_button = self.driver.find_element(By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")
-            juyo_button.click()
+            #Clicks the 「重要」button
+            juyo_button_click(driver=self.driver,wait=self.wait)
 
             #If「もっと表示」button, click
-            self.wait.until(EC.presence_of_all_elements_located)
-            motto_button = check_exists_by_xpath(driver=self.driver,xpath="/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/div/div[2]/a")
-            if motto_button:
-                motto_button.click()
+            motto_button_click(driver=self.driver,wait=self.wait)
             
             #Taking out the time.sleep() in the future
             self.wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME,"ui-datalist-item")))
@@ -107,6 +91,7 @@ class UNIPA_Login():
                     pass
                 cnt += 1
             print(self.assignment_list)
+
             for _ in range(len(self.assignment_list)):
                 print(self.assignment_list[_][0])
                 content = self.get_assignment_detail(self.assignment_list[_][0])
@@ -122,9 +107,9 @@ class UNIPA_Login():
         return self.assignment_list
     
     def get_assignment_detail(self,id):
-        #Clicking the assignment, atriving content
+        """Gets the assignment detail under id
+        """
         try:
-            #self.wait.until(EC.presence_of_element_located((By.ID,id)))
             assignment_btn = self.driver.find_element(By.ID,id)
             assignment_btn.click()
             self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR,"div.fr-box.fr-view")))
@@ -133,10 +118,8 @@ class UNIPA_Login():
             home_btn = self.driver.find_element(By.ID,"headerForm:j_idt54")
             home_btn.click()
 
-            #Getting the assignment information
-            self.wait.until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")))
-            juyo_button = self.driver.find_element(By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")
-            juyo_button.click()
+            #Clicks the 「重要」button
+            juyo_button_click(driver=self.driver, wait=self.wait)
 
             #If「もっと表示」button, click
             self.wait.until(EC.presence_of_all_elements_located)
@@ -178,9 +161,6 @@ class UNIPA_Submit(UNIPA_Login):
 
     def __init__(self, ID, PWD):
         super().__init__(ID, PWD)
-        #Opening the Chrome browser
-        #self.driver = webdriver.Chrome(service=chrome_service,options=options)
-        #self.wait = WebDriverWait(self.driver,timeout=30)
 
     def __enter__(self):
         return self
@@ -207,17 +187,17 @@ class UNIPA_Submit(UNIPA_Login):
             time.sleep(3)
             assignment_btn = self.driver.find_element(By.ID,id)
             assignment_btn.click()
-            #time.sleep(100)
 
             #Submitting the assignment
             submission_box = self.driver.find_element(By.ID,"funcForm:kdiTstAccordion:j_idt430:fileUpload1_input")
             submit_btn = self.driver.find_element(By.ID,"funcForm:j_idt500")
             confirm_yes_btn = self.driver.find_element(By.ID,"yes")
 
+            time.sleep(5)
             submission_box.send_keys(file_path)
             self.wait.until(EC.presence_of_element_located((By.ID,"funcForm:kdiTstAccordion:j_idt433:j_idt434:0:j_idt437")))
             submit_btn.click()
-            time.sleep(5)
+            time.sleep(3)
             confirm_yes_btn.click()
             #Error occurs, so wait implicitly
             #time.sleep(10)
@@ -233,12 +213,6 @@ def check_id(id,pwd,url):
             #Login to account
             driver = webdriver.Chrome(service=chrome_service,options=options)
             driver.get(url=url)
-            username_input = driver.find_element(By.ID,"loginForm:userId")
-            pwd_input = driver.find_element(By.ID,"loginForm:password")
-            login_btn = driver.find_element(By.ID,"loginForm:loginButton")
-            username_input.send_keys(id)
-            pwd_input.send_keys(pwd)
-            login_btn.click()
             if driver.find_elements(By.CLASS_NAME,"ui-messages-error"):
                 driver.close()
                 return "ERROR"
@@ -256,6 +230,41 @@ def check_id(id,pwd,url):
             print(e)
             return "ERROR"
 
+def juyo_button_click(driver: webdriver.Chrome, wait: WebDriverWait):
+    """Clicks 「重要」button
+    """
+    try:
+        wait.until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")))
+        juyo_button = driver.find_element(By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")
+        juyo_button.click()
+        return True
+    except Exception as e:
+        print(e)
+
+def motto_button_click(driver: webdriver.Chrome, wait: WebDriverWait):
+    """Clicks 「もっと表示」button if available
+    """
+    try:
+        wait.until(EC.presence_of_all_elements_located)
+        motto_button = check_exists_by_xpath(driver=driver,xpath="/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/div/div[2]/div/div[2]/a")
+        if motto_button:
+            motto_button.click()
+        return True
+    except Exception as e:
+        print(e)
+
+def login(driver: webdriver.Chrome,id: str,pwd: str, url: str, wait: WebDriverWait):
+    try:
+        driver.get(url=url)
+        wait.until(EC.presence_of_all_elements_located)
+        username_input = driver.find_element(By.ID,"loginForm:userId")
+        pwd_input = driver.find_element(By.ID,"loginForm:password")
+        login_btn = driver.find_element(By.ID,"loginForm:loginButton")
+        username_input.send_keys(id)
+        pwd_input.send_keys(pwd)
+        login_btn.click()
+    except Exception as e:
+        print(e)
 
 #Test
 if __name__ == "__main__":
