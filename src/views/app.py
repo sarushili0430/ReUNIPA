@@ -53,8 +53,9 @@ class HomeView(ft.UserControl):
 
         #Handling the assignment list
         self.assignment_path = None
-        self.retry_get_assignment_btn = ft.IconButton(icon=ft.icons.REFRESH)
+        self.retry_get_assignment_btn = ft.IconButton(icon=ft.icons.REFRESH,on_click=self.refresh_assignment_list)
         self.lv = ft.ListView(expand=1.0,spacing=20,padding=20)
+        #Controlling the assignments list according to assignments.
         if assignments == []:
             pass
         elif assignments == None:
@@ -149,28 +150,27 @@ class HomeView(ft.UserControl):
         self.assignment_details.value = e.control.data[1]
         self.update()
         print(self.assignment_name)
+    
+    def refresh_assignment_list(self, e):
+        new_assignment_list = []
+        try:
+            with UNIPA_Login(UNIPA_ID,UNIPA_PWD) as client:
+                new_assignment_list = client.get_assignment()
+            self.lv.clean()
+            for _ in range(len(self.assignments)): self.lv.controls.append(ft.TextButton(text=new_assignment_list[_][1],on_click=self.assignment_clicked,data=[new_assignment_list[_][1],new_assignment_list[_][3]]))
+            self.assignments = list_to_dict(new_assignment_list)
+        except:
+            self.lv.clean()
+            self.lv.controls.append(self.retry_get_assignment_btn)
 
     def build(self):
         return ft.Column([self.header,self.body])
-    
 
-class AppMain():
-    def __init__(self,assignments:list):
-        self.assignments = assignments
-    
-    def app_main(self,page: ft.Page):
-        page.title = "ReUNIPA"
-        page.scroll = "ADAPTIVE"
-        page.window_width = 896
-        page.window_height = 504
-        pickfile = ft.FilePicker(on_result=lambda x: print("completed"))
-        page.overlay.append(pickfile)  
-        #lv.controls.append(ft.TextButton(text="assignment1"))
-
-        body = HomeView(page=page,assignments=self.assignments)
-
-        page.add(body)
+def main(page: ft.Page):
+    page.window_width = 896
+    page.window_height = 504
+    page.window_visible = True
+    page.add(HomeView(page,assignments=None))
 
 if __name__ == "__main__":
-    ReUNIPA = AppMain(assignments=ASSIGNMENTS)
-    ft.app(target=ReUNIPA.app_main)
+    ft.app(target=main)
