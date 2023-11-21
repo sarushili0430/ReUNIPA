@@ -2,8 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome import service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from tools import check_exists_by_xpath
@@ -108,12 +106,15 @@ class UNIPA_Login():
                 except:
                     pass
                 cnt += 1
-            
+            print(self.assignment_list)
             for _ in range(len(self.assignment_list)):
+                print(self.assignment_list[_][0])
                 content = self.get_assignment_detail(self.assignment_list[_][0])
                 print(_)
                 print(content)
                 self.assignment_list[_].append(content)
+                #Too much http requests at a time => Implicit wait (Time lag occured by browser rendering)
+                time.sleep(1)
         except Exception as e:
             print(e)
             self.assignment_list = None
@@ -123,17 +124,17 @@ class UNIPA_Login():
     def get_assignment_detail(self,id):
         #Clicking the assignment, atriving content
         try:
-            self.wait.until(EC.presence_of_element_located((By.ID,id)))
+            #self.wait.until(EC.presence_of_element_located((By.ID,id)))
             assignment_btn = self.driver.find_element(By.ID,id)
             assignment_btn.click()
-            self.wait.until(EC.presence_of_all_elements_located)
+            self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR,"div.fr-box.fr-view")))
             content = self.driver.find_element(By.CSS_SELECTOR,"div.fr-box.fr-view").get_attribute("textContent")
             self.wait.until(EC.presence_of_element_located((By.ID,"headerForm:j_idt54")))
             home_btn = self.driver.find_element(By.ID,"headerForm:j_idt54")
             home_btn.click()
 
             #Getting the assignment information
-            self.wait.until(EC.presence_of_all_elements_located)
+            self.wait.until(EC.presence_of_element_located((By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")))
             juyo_button = self.driver.find_element(By.XPATH,"/html/body/div[4]/div[5]/div[2]/form/div[2]/div[1]/div[1]/ul/li[2]")
             juyo_button.click()
 
