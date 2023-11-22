@@ -41,7 +41,7 @@ def main(page: ft.Page):
     #Login process handling
     if UNIPA_ID == "" or UNIPA_PWD=="" or UNIPA_URL == "":
         page.go("/login")
-    elif check_id(id=UNIPA_ID,pwd=UNIPA_PWD,url=UNIPA_URL) == "ERROR":
+    elif check_id(id=UNIPA_ID,pwd=UNIPA_PWD,url=UNIPA_URL) == False:
         page.go("/login")
         page.snack_bar = ft.SnackBar(content=ft.Text("Login Failed"),duration=2000,bgcolor="#F94C10")
         page.snack_bar.open = True
@@ -52,4 +52,4 @@ def main(page: ft.Page):
         page.snack_bar.open = True
         page.update()
 
-ft.app(target=main, view=ft.AppView.FLET_APP_HIDDEN)
+    ft.app(target=main,view=ft.AppView.FLET_APP_HIDDEN)

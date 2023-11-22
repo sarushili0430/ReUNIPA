@@ -46,7 +46,7 @@ class LoginView(ft.UserControl):
         check_result = check_id(id=self.username.value,pwd=self.pwd.value,url=self.unipa_url.value)
 
         #Check whether id is available or not
-        if check_result == "SUCCESS":
+        if check_result:
             #Enable submit button
             print("SUCCESS")
             self.page.go("/")

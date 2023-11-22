@@ -31,7 +31,7 @@ class HomeView(ft.UserControl):
             text_align="Center",
         )
         self.assignment_name = ft.Text(
-            value = "Assignment Name",
+            value = "",
             width = 560,
             height = 60,
             text_align="Center",
@@ -45,7 +45,6 @@ class HomeView(ft.UserControl):
                     self.assignment_name,
                 ],
             ),
-
             padding=20,
         )
         #Body Components
@@ -69,18 +68,18 @@ class HomeView(ft.UserControl):
         self.page.controls.append(self.pickfile)
         self.page.overlay.append(self.pickfile)
         self.assignment_details = ft.Text(
-            value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris non iaculis arcu.",
-            width=560,
-            height=260,
-            text_align="Left",
-            font_family="Inter",
-            size=15,
-            max_lines=100,
-        )
+                                        value="",
+                                        width=560,
+                                        height=260,
+                                        text_align="Left",
+                                        font_family="Inter",
+                                        size=15,
+                                        max_lines=100,
+                                        )
         self.pickfile_btn = ft.ElevatedButton(text="Pick Files",
                                 icon=ft.icons.UPLOAD_FILE,
                                 on_click=lambda x: self.pickfile.pick_files(allow_multiple=False)
-                )
+        )
         self.file_submit_btn = ft.TextButton(text="Submit",on_click=self.assignment_submit_clicked,disabled=True)
         self.assignment_submition = ft.Container(
             ft.Row(
@@ -89,7 +88,7 @@ class HomeView(ft.UserControl):
                     self.file_submit_btn,
                 ]
             ),
-            padding = ft.padding.symmetric(horizontal=20)
+            padding = ft.padding.symmetric(horizontal=20),
         )
         self.body = ft.Container(
             ft.Row(
@@ -97,7 +96,10 @@ class HomeView(ft.UserControl):
                     self.assignment_list,
                     ft.Column(
                         [
-                            self.assignment_details,
+                            ft.Container(
+                                self.assignment_details,
+                                margin=ft.margin.only(left=20)
+                            ),
                             self.assignment_submition,
                         ]
                     )
@@ -153,7 +155,6 @@ class HomeView(ft.UserControl):
             self.assignments = list_to_dict(new_assignment_list)
             for _ in range(len(self.assignments)): self.lv.controls.append(ft.TextButton(text=new_assignment_list[_][1],on_click=self.assignment_clicked,data=[new_assignment_list[_][1],new_assignment_list[_][3]]))
             print(new_assignment_list)
-            print("go to listtodict")
         except Exception as e:
             print(e)
             self.lv.clean()
