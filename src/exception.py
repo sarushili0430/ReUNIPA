@@ -1,0 +1,2 @@
+class ButtonIntractError(Exception):
+    
