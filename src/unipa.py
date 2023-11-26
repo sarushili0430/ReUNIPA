@@ -102,12 +102,7 @@ class UNIPA_Login:
                     assignment_name = _.find_element(
                         By.ID, "funcForm:j_idt162:j_idt211:" + str(cnt) + ":j_idt232"
                     ).get_attribute("textContent")
-                    assignment_deadline = _.find_elements(
-                        By.CSS_SELECTOR, "span.textDate"
-                    )[1].get_attribute("textContent")
-                    self.assignment_list.append(
-                        [assignment_id, assignment_name, assignment_deadline]
-                    )
+                    self.assignment_list.append([assignment_id, assignment_name])
                 except:
                     pass
                 cnt += 1
@@ -118,7 +113,7 @@ class UNIPA_Login:
                 content = self.get_assignment_detail(self.assignment_list[_][0])
                 print(_)
                 print(content)
-                self.assignment_list[_].append(content)
+                self.assignment_list[_].extend(content)
                 # Too much http requests at a time => Implicit wait (Time lag occured by browser rendering)
                 time.sleep(1)
 
@@ -135,7 +130,7 @@ class UNIPA_Login:
           id (str): id-tag of the assignment
 
         Return:
-          str: Content of the assignment
+          list: Detail and deadline of the assignment
         """
         try:
             # Clicks the assignment, and moves to the assignment detail page
@@ -146,6 +141,10 @@ class UNIPA_Login:
             )
             content = self.driver.find_element(
                 By.CSS_SELECTOR, "div.fr-box.fr-view"
+            ).get_attribute("textContent")
+            deadline = self.driver.find_element(
+                By.XPATH,
+                "/html/body/div[4]/div[5]/div[2]/form/div[2]/div[2]/div[1]/table/tbody/tr[4]/td[2]/div/span[3]",
             ).get_attribute("textContent")
 
             # Returns to initial screen
@@ -164,7 +163,7 @@ class UNIPA_Login:
         except Exception as e:
             raise e
 
-        return content
+        return [content, deadline]
 
     def get_attached_file(self):
         """Gets the attached file when available
