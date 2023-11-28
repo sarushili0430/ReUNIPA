@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from tools import check_exists_by_xpath
+from tools import format_datetime
 from dotenv import load_dotenv
 
 from datetime import datetime
@@ -146,6 +147,8 @@ class UNIPA_Login:
                 By.XPATH,
                 "/html/body/div[4]/div[5]/div[2]/form/div[2]/div[2]/div[1]/table/tbody/tr[4]/td[2]/div/span[3]",
             ).get_attribute("textContent")
+            # Formatting deadline to datetime understandable string
+            deadline = format_datetime(deadline)
             submit_method = True
 
             # Returns to initial screen
@@ -272,7 +275,6 @@ class UNIPA_Submit(UNIPA_Login):
             time.sleep(3)
             confirm_yes_btn.click()
             # Error occurs, so wait implicitly
-            # time.sleep(10)
             self.wait.until(
                 EC.presence_of_element_located((By.ID, "funcForm:j_idt496"))
             )

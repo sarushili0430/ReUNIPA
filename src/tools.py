@@ -16,6 +16,12 @@ def check_exists_by_xpath(driver, xpath):
     return element
 
 
+def format_datetime(date):
+    new_date = date[0:9]
+    new_time = date[14:]
+    return str(new_date + " " + new_time).replace("/", "-")
+
+
 def list_to_dict(ls: list):
     assign_dict = {}
     for _ in ls:
