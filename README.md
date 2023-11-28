@@ -1,13 +1,13 @@
 # ReUNIPA
-
-多くの大学生が苦しむUNIPAの状況を改善するために作り始めたアプリ
-一般化出来るか分からないが、おそらくフレームは一緒のはずなので皆さん使えるといいな
+UNIPAを使いやすくするために始まったプロジェクト。
+このアプリを通してUNIPAへ課題を提出することが可能である（ただし、現在はファイル提出のもののみに対応している。）
 
 ## Demo
 Tbd  
 
 ## Features
-Tbd  
+>Assignment Submission can be done via this app.
+Else, Tbd....
 
 ## Requirement
 * 自分のブラウザに合ったバージョンのWebDriver  
@@ -15,10 +15,15 @@ Tbd
 * Flet
 
 ## Installation
-``` pip install -f requirements.txt ```
+For Windows Users:
+Under ReUNIPA directory
+```
+python3 -m venv venv
+.\venv\Scripts\activate
+pip install -r requirements.txt
+cd src
+flet pack main.py
+```
 
 ## Usage
-
-### ID, Password
-
-.env_example をコピーし，.env にリネームしてください．
+Click the main app.
