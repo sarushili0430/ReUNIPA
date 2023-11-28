@@ -42,7 +42,6 @@ options.add_argument(
 )
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.add_experimental_option("useAutomationExtension", False)
-options.page_load_strategy = "eager"
 options.add_argument("--disable-extensions")
 options.add_argument("--start-maximized")
 options.add_argument("--headless=new")
@@ -130,7 +129,8 @@ class UNIPA_Login:
           id (str): id-tag of the assignment
 
         Return:
-          list: Detail and deadline of the assignment
+          list: Detail and deadline of the assignment [Datetime,Detail]
+
         """
         try:
             # Clicks the assignment, and moves to the assignment detail page
@@ -146,13 +146,10 @@ class UNIPA_Login:
                 By.XPATH,
                 "/html/body/div[4]/div[5]/div[2]/form/div[2]/div[2]/div[1]/table/tbody/tr[4]/td[2]/div/span[3]",
             ).get_attribute("textContent")
+            submit_method = True
 
             # Returns to initial screen
-            self.wait.until(
-                EC.presence_of_element_located((By.ID, "headerForm:j_idt54"))
-            )
-            home_btn = self.driver.find_element(By.ID, "headerForm:j_idt54")
-            home_btn.click()
+            home_button_click(driver=self.driver, wait=self.wait)
 
             # Clicks the 「期限あり」button
             kigenari_button_click(driver=self.driver, wait=self.wait)
@@ -324,6 +321,24 @@ def check_id(id: str, pwd: str, url: str):
     except Exception as e:
         print(e)
         return False
+
+
+def home_button_click(driver: webdriver.Chrome, wait: WebDriverWait):
+    """Clicks UNIPAロゴ and goes to home
+
+    Args:
+      driver (webdriver.Chrome): The target webdriver
+      wait (webDriverWair): The target webdriver's wait instance
+
+    Return:
+      bool: True when succeed clicking button
+    """
+    try:
+        wait.until(EC.presence_of_element_located((By.ID, "headerForm:j_idt54")))
+        home_btn = driver.find_element(By.ID, "headerForm:j_idt54")
+        home_btn.click()
+    except Exception as e:
+        print(e)
 
 
 def kigenari_button_click(driver: webdriver.Chrome, wait: WebDriverWait):
