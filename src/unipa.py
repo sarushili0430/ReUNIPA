@@ -7,8 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from tools import check_exists_by_xpath
 from tools import format_datetime
 from dotenv import load_dotenv
-
-from datetime import datetime
+from exception import *
 import time
 import os
 import dotenv
@@ -339,8 +338,8 @@ def home_button_click(driver: webdriver.Chrome, wait: WebDriverWait):
         wait.until(EC.presence_of_element_located((By.ID, "headerForm:j_idt54")))
         home_btn = driver.find_element(By.ID, "headerForm:j_idt54")
         home_btn.click()
-    except Exception as e:
-        print(e)
+    except:
+        raise HomeBtnIntractError
 
 
 def kigenari_button_click(driver: webdriver.Chrome, wait: WebDriverWait):
@@ -369,7 +368,7 @@ def kigenari_button_click(driver: webdriver.Chrome, wait: WebDriverWait):
         kigenari_button.click()
         return True
     except Exception as e:
-        print(e)
+        raise KigenariBtnIntractError
 
 
 def motto_button_click(driver: webdriver.Chrome, wait: WebDriverWait):
@@ -391,8 +390,8 @@ def motto_button_click(driver: webdriver.Chrome, wait: WebDriverWait):
         if motto_button:
             motto_button.click()
         return True
-    except Exception as e:
-        print(e)
+    except:
+        raise MottoBtnIntractError
 
 
 def login(driver: webdriver.Chrome, wait: WebDriverWait, id: str, pwd: str, url: str):
