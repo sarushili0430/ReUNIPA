@@ -25,7 +25,7 @@ def format_datetime(date):
 def list_to_dict(ls: list):
     assign_dict = {}
     for _ in ls:
-        assign_dict[_[1]] = _[0]
+        assign_dict[_[1]] = [_[0], _[4]]
     return assign_dict
 
 

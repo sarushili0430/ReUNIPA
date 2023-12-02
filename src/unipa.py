@@ -264,7 +264,7 @@ class UNIPA_Submit(UNIPA_Login):
     def __exit__(self, exception_type, exception_value, traceback):
         self.driver.close()
 
-    def submit_assignment(self, id: str, file_path: str):
+    def submit_assignment(self, id: str, **kwargs):
         """Submitting the Assignment
 
         Args:
@@ -291,18 +291,26 @@ class UNIPA_Submit(UNIPA_Login):
             assignment_btn.click()
 
             # Submitting the assignment
-            submission_box = self.driver.find_element(
-                By.ID, "funcForm:kdiTstAccordion:j_idt430:fileUpload1_input"
-            )
+            if kwargs.get("file_path"):
+                submission_box = self.driver.find_element(
+                    By.ID, "funcForm:kdiTstAccordion:j_idt430:fileUpload1_input"
+                )
+                time.sleep(5)
+                submission_box.send_keys(kwargs.get("file_path"))
+                self.wait.until(
+                    EC.presence_of_element_located(
+                        (By.ID, "funcForm:kdiTstAccordion:j_idt433:j_idt434:0:j_idt437")
+                    )
+                )
+            elif kwargs.get("text"):
+                submission_box = self.driver.find_element(
+                    By.ID, "funcForm:kdiTstAccordion:tstContent"
+                )
+                time.sleep(5)
+                submission_box.send_keys(kwargs.get("text"))
+
             submit_btn = self.driver.find_element(By.ID, "funcForm:j_idt500")
             confirm_yes_btn = self.driver.find_element(By.ID, "yes")
-            time.sleep(5)
-            submission_box.send_keys(file_path)
-            self.wait.until(
-                EC.presence_of_element_located(
-                    (By.ID, "funcForm:kdiTstAccordion:j_idt433:j_idt434:0:j_idt437")
-                )
-            )
             submit_btn.click()
             time.sleep(3)
             confirm_yes_btn.click()
