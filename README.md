@@ -35,5 +35,11 @@ cd src
 flet pack main.py
 ```
 
+## Future
+Check the attendance of a subject.
+Download files from the correspoding page.
+
+
 ## Usage
-Click the main app.
+Click the main app after packing.
+
