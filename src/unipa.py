@@ -341,6 +341,7 @@ def check_id(id: str, pwd: str, url: str):
         # Login to account
         driver = webdriver.Chrome(service=chrome_service, options=options)
         driver.get(url=url)
+        # login(driver=driver)
         if driver.find_elements(By.CLASS_NAME, "ui-messages-error"):
             driver.close()
             return False
