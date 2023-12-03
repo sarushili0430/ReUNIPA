@@ -14,20 +14,23 @@ ASSIGNMENTS = [
     [
         "funcForm:j_idt162:j_idt211:0:j_idt232",
         "Lecture 12 EX",
-        "2023/11/02",
         "See the attached file and submit your file by the end of next Thursday.\n        ",
+        "2023/11/02",
+        "FILE",
     ],
     [
         "funcForm:j_idt162:j_idt211:1:j_idt232",
         "Quiz 12 first submission",
-        "2023/11/03",
         'Hello students!This is for the first submission for Quiz 12.Before giving marks for your answers, take a photo of the Quiz paper, and then submit the photo to here. That is the confirmation that you solved the Quiz by yourself. The submission deadline is 8am on 3rd November.Give the filename of the photo as follows:2021m000_Quiz12_1.jpgFilename consists of "student ID number" + "Quiz number" + "submission number". Your cooperation will be appreciated.Enjoy everything!Kind regards,Takahiro Namazu\n        ',
+        "2023/11/03",
+        "FILE",
     ],
     [
         "funcForm:j_idt162:j_idt211:2:j_idt232",
         "遠隔課題\u3000スポーツと国際社会人基礎力  Online assignment: Sport and Basic Skills for International Working Adult",
-        "2023/11/08",
         'SLSⅣ\u3000種目共通課題②\u3000スポーツと国際社会人基礎力今回のテーマは「スポーツと国際社会人基礎力」です。下記のURLから動画を視聴し、動画内で指示された課題を提出してください。231024_秋学期SLSⅣ種目共通課題②_梶田担当.mp4\xa0【レポート提出について】文字数：①②の合計で全角400字（半角800字）程度期\u3000限：11月8日\u30009:29まで方\u3000法：先端なびからWeb提出遠隔授業における映像視聴と課題提出により、今週の授業は出席になります。それでは今週も課題提出期限に間に合うように、計画的に取り組みましょう。早川The theme of this week\'s on-demand assignment is " Sport and Basic Skills for International working Adult ".Please watch the video at the URL below and submit the assignment indicated in the video.231024_秋学期SLSⅣ種目共通課題②_梶田担当_英語版.mp4\xa0【Report Submission】Number of words：about 200 wordsThe deadline of submission：November 8th 9:29.Submission method：web submission from “sentan navi”.For remote classes, attendance is considered as both viewing the video and submitting assignments.Hayakawa\n        ',
+        "2023/11/08",
+        "TEXT",
     ],
 ]
 
@@ -68,7 +71,6 @@ class HomeView(ft.UserControl):
             padding=20,
         )
         # Body Components
-        self.assignment_path = None
         self.retry_get_assignment_btn = ft.IconButton(
             icon=ft.icons.REFRESH, on_click=self.refresh_assignment_list
         )
@@ -80,12 +82,13 @@ class HomeView(ft.UserControl):
             self.lv.controls.append(self.retry_get_assignment_btn)
         else:
             self.assignments = list_to_dict(assignments)
+            print(self.assignments)
             for _ in range(len(self.assignments)):
                 self.lv.controls.append(
                     ft.TextButton(
                         text=assignments[_][1],
                         on_click=self.assignment_clicked,
-                        data=[assignments[_][1], assignments[_][3]],
+                        data=[assignments[_][1], assignments[_][2], assignments[_][4]],
                     )
                 )
         self.assignment_list = ft.Container(
@@ -98,8 +101,6 @@ class HomeView(ft.UserControl):
         self.page.overlay.append(self.pickfile)
         self.assignment_details = ft.Text(
             value="",
-            width=560,
-            height=260,
             text_align="Left",
             font_family="Inter",
             size=15,
@@ -109,13 +110,33 @@ class HomeView(ft.UserControl):
             text="Pick Files",
             icon=ft.icons.UPLOAD_FILE,
             on_click=lambda x: self.pickfile.pick_files(allow_multiple=False),
+            visible=False,
+        )
+        self.text_submit_box = ft.TextField(
+            width=500,
+            min_lines=1,
+            max_lines=20,
+            multiline=True,
+            on_change=self.assignment_text_entered,
+            visible=False,
+        )
+        self.text_submit_box_container = ft.Column(
+            [self.text_submit_box],
+            scroll=ft.ScrollMode.HIDDEN,
+            width=500,
+            height=60,
+            visible=False,
         )
         self.file_submit_btn = ft.TextButton(
-            text="Submit", on_click=self.assignment_submit_clicked, disabled=True
+            text="Submit",
+            on_click=self.assignment_submit_clicked,
+            visible=False,
+            disabled=True,
         )
         self.assignment_submition = ft.Container(
             ft.Row(
                 [
+                    self.text_submit_box_container,
                     self.pickfile_btn,
                     self.file_submit_btn,
                 ]
@@ -129,21 +150,50 @@ class HomeView(ft.UserControl):
                     ft.Column(
                         [
                             ft.Container(
-                                self.assignment_details, margin=ft.margin.only(left=20)
+                                ft.Column(
+                                    [self.assignment_details],
+                                    expand=1,
+                                    scroll=ft.ScrollMode.HIDDEN,
+                                ),
+                                width=560,
+                                height=260,
+                                margin=ft.margin.only(left=20),
                             ),
                             self.assignment_submition,
-                        ]
+                        ],
                     ),
                 ]
             ),
         )
         self.page.snack_bar = ft.SnackBar(content=ft.Text("Submit Successful"))
 
+    def assignment_clicked(self, e):
+        self.change_assignment_name(name=e.control.data[0])
+        self.assignment_details.value = e.control.data[1]
+        self.file_submit_btn.visible = True
+        if e.control.data[2] == "FILE":
+            self.pickfile_btn.visible = True
+            self.text_submit_box.visible = False
+            self.text_submit_box_container.visible = False
+        elif e.control.data[2] == "TEXT":
+            self.pickfile_btn.visible = False
+            self.text_submit_box.visible = True
+            self.text_submit_box_container.visible = True
+        self.update()
+        print(self.assignment_name)
+
     def change_assignment_name(self, name):
         self.assignment_name.value = name
         print(self.assignment_name.value)
         self.update()
         print(self.assignment_name.value)
+
+    def assignment_text_entered(self, e):
+        if e.control.value != "":
+            self.file_submit_btn.disabled = False
+        else:
+            self.file_submit_btn.disabled = True
+        self.update()
 
     def assignment_file_selected(self, e: ft.FilePickerResultEvent):
         try:
@@ -156,27 +206,28 @@ class HomeView(ft.UserControl):
 
     def assignment_submit_clicked(self, e):
         with UNIPA_Submit(UNIPA_ID, UNIPA_PWD) as client:
-            result = client.submit_assignment(
-                id=self.assignments[self.assignment_name.value],
-                file_path=self.assignment_path,
-            )
+            if self.assignments[self.assignment_name.value][1] == "FILE":
+                result = client.submit_assignment(
+                    id=self.assignments[self.assignment_name.value][0],
+                    file_path=self.assignment_path,
+                )
+            elif self.assignments[self.assignment_name.value][1] == "TEXT":
+                result = client.submit_assignment(
+                    id=self.assignments[self.assignment_name.value][0],
+                    text=self.text_submit_box.value,
+                )
         if result == True:
             self.page.snack_bar.content = ft.Text("Submit Success")
             self.page.snack_bar.open = True
             self.page.update()
             self.refresh_assignment_list()
+            self.clear_assignment_detail()
         else:
             self.page.snack_bar.content = ft.Text("Submit failed")
             self.page.snack_bar.bgcolor = "#F94C10"
             self.page.snack_bar.open = True
             self.page.update()
         print("Submission result: " + str(result))
-
-    def assignment_clicked(self, e):
-        self.change_assignment_name(name=e.control.data[0])
-        self.assignment_details.value = e.control.data[1]
-        self.update()
-        print(self.assignment_name)
 
     def refresh_assignment_list(self, e=None):
         new_assignment_list = []
@@ -200,6 +251,14 @@ class HomeView(ft.UserControl):
             self.lv.controls.append(self.retry_get_assignment_btn)
         self.update()
 
+    def clear_assignment_detail(self):
+        self.assignment_details.value = ""
+        self.assignment_name.value = ""
+        self.pickfile_btn.visible = False
+        self.text_submit_box.visible = False
+        self.file_submit_btn.visible = False
+        self.update()
+
     def build(self):
         return ft.Column([self.header, self.body])
 
@@ -208,7 +267,7 @@ def main(page: ft.Page):
     page.window_width = 896
     page.window_height = 504
     page.window_visible = True
-    page.add(HomeView(page, assignments=None))
+    page.add(HomeView(page, assignments=ASSIGNMENTS))
 
 
 if __name__ == "__main__":

@@ -36,6 +36,7 @@ def main(page: ft.Page):
     page.on_route_change = route_change
     # On initial state
     page.go("/home")
+    print(check_id(id=UNIPA_ID, pwd=UNIPA_PWD, url=UNIPA_URL))
 
     # Login process handling
     if UNIPA_ID == "" or UNIPA_PWD == "" or UNIPA_URL == "":

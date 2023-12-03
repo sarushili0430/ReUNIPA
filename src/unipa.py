@@ -6,6 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from tools import check_exists_by_xpath
 from tools import format_datetime
+from tools import file_downloaded
 from dotenv import load_dotenv
 from exception import *
 import time
@@ -21,6 +22,7 @@ SIGNINURL = os.environ["UNIPA_URL"]
 USERID = os.environ["UNIPA_ID"]
 USERPWD = os.environ["UNIPA_PWD"]
 EMPTY = "EMPTY"
+DOWNLOAD_PATH = "C:/Users/kouyu/Downloads"
 
 # Setting up the selenium browser
 chrome_service = service.Service(executable_path=CHROMEDRIVER)
@@ -148,7 +150,7 @@ class UNIPA_Login:
             ).get_attribute("textContent")
             # Formatting deadline to datetime understandable string
             deadline = format_datetime(deadline)
-            submit_method = True
+            submit_method = self.get_submit_method()
 
             # Returns to initial screen
             home_button_click(driver=self.driver, wait=self.wait)
@@ -162,7 +164,31 @@ class UNIPA_Login:
         except Exception as e:
             raise e
 
-        return [content, deadline]
+        return [content, deadline, submit_method]
+
+    def get_submit_method(self):
+        """Gets the submission method
+
+        Return:
+          str: "TEXT" if submission is text-based
+               "FILE" if submission is file-based
+        """
+        if (
+            len(self.driver.find_elements(By.ID, "funcForm:kdiTstAccordion:tstContent"))
+            > 0
+        ):
+            return "TEXT"
+        elif (
+            len(
+                self.driver.find_elements(
+                    By.ID, "funcForm:kdiTstAccordion:j_idt430:fileUpload1_input"
+                )
+            )
+            > 0
+        ):
+            return "FILE"
+        else:
+            return False
 
     def get_attached_file(self):
         """Gets the attached file when available
@@ -203,12 +229,19 @@ class UNIPA_Login:
                 assignment_file_name.append(_.get_attribute("textContent"))
 
             # Download all files available
-            while True:
-                download_btn = self.driver.find_element(
-                    By.ID, "pkx02201:ch:appendList:" + str(cnt) + ":j_idt588"
-                )
-                download_btn.click()
-                cnt += 1
+            try:
+                while True:
+                    download_btn = self.driver.find_element(
+                        By.ID, "pkx02201:ch:appendList:" + str(cnt) + ":j_idt588"
+                    )
+                    download_btn.click()
+                    cnt += 1
+            except:
+                pass
+
+            # Wait until all files are downloaded
+            for _ in assignment_file_name:
+                self.wait(file_downloaded(DOWNLOAD_PATH + "/" + _))
         except:
             pass
 
@@ -231,7 +264,7 @@ class UNIPA_Submit(UNIPA_Login):
     def __exit__(self, exception_type, exception_value, traceback):
         self.driver.close()
 
-    def submit_assignment(self, id: str, file_path: str):
+    def submit_assignment(self, id: str, **kwargs):
         """Submitting the Assignment
 
         Args:
@@ -258,18 +291,26 @@ class UNIPA_Submit(UNIPA_Login):
             assignment_btn.click()
 
             # Submitting the assignment
-            submission_box = self.driver.find_element(
-                By.ID, "funcForm:kdiTstAccordion:j_idt430:fileUpload1_input"
-            )
+            if kwargs.get("file_path"):
+                submission_box = self.driver.find_element(
+                    By.ID, "funcForm:kdiTstAccordion:j_idt430:fileUpload1_input"
+                )
+                time.sleep(5)
+                submission_box.send_keys(kwargs.get("file_path"))
+                self.wait.until(
+                    EC.presence_of_element_located(
+                        (By.ID, "funcForm:kdiTstAccordion:j_idt433:j_idt434:0:j_idt437")
+                    )
+                )
+            elif kwargs.get("text"):
+                submission_box = self.driver.find_element(
+                    By.ID, "funcForm:kdiTstAccordion:tstContent"
+                )
+                time.sleep(5)
+                submission_box.send_keys(kwargs.get("text"))
+
             submit_btn = self.driver.find_element(By.ID, "funcForm:j_idt500")
             confirm_yes_btn = self.driver.find_element(By.ID, "yes")
-            time.sleep(5)
-            submission_box.send_keys(file_path)
-            self.wait.until(
-                EC.presence_of_element_located(
-                    (By.ID, "funcForm:kdiTstAccordion:j_idt433:j_idt434:0:j_idt437")
-                )
-            )
             submit_btn.click()
             time.sleep(3)
             confirm_yes_btn.click()
