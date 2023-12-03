@@ -16,7 +16,7 @@ class LoginView(ft.UserControl):
         self.pwd = ft.TextField(
             label="UNIPA Password", password=True, can_reveal_password=True
         )
-        self.submit = ft.ElevatedButton(text="Submit", on_click=self.check_login)
+        self.submit = ft.ElevatedButton(text="Login", on_click=self.check_login)
         self.prog_ring = ft.ProgressRing(visible=False)
         # Login condition banner
         self.page.snack_bar = ft.SnackBar(content=ft.Text("Login Successful"))

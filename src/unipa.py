@@ -298,9 +298,17 @@ def check_id(id: str, pwd: str, url: str):
     """
     try:
         # Login to account
-        driver = webdriver.Chrome(service=chrome_service, options=options)
+        driver = webdriver.Chrome(options=options, service=chrome_service)
+        wait = WebDriverWait(driver=driver, timeout=30)
         driver.get(url=url)
-        if driver.find_elements(By.CLASS_NAME, "ui-messages-error"):
+        wait.until(EC.presence_of_all_elements_located)
+        username_input = driver.find_element(By.ID, "loginForm:userId")
+        pwd_input = driver.find_element(By.ID, "loginForm:password")
+        login_btn = driver.find_element(By.ID, "loginForm:loginButton")
+        username_input.send_keys(id)
+        pwd_input.send_keys(pwd)
+        login_btn.click()
+        if driver.find_elements(By.ID, "errForm"):
             driver.close()
             return False
         else:
