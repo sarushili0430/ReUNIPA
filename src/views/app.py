@@ -168,6 +168,7 @@ class HomeView(ft.UserControl):
         self.page.snack_bar = ft.SnackBar(content=ft.Text("Submit Successful"))
 
     def assignment_clicked(self, e):
+        print(e.control.data)
         self.change_assignment_name(name=e.control.data[0])
         self.assignment_details.value = e.control.data[1]
         self.file_submit_btn.visible = True
@@ -241,7 +242,11 @@ class HomeView(ft.UserControl):
                     ft.TextButton(
                         text=new_assignment_list[_][1],
                         on_click=self.assignment_clicked,
-                        data=[new_assignment_list[_][1], new_assignment_list[_][3]],
+                        data=[
+                            new_assignment_list[_][1],
+                            new_assignment_list[_][2],
+                            new_assignment_list[_][4],
+                        ],
                     )
                 )
             print(new_assignment_list)
