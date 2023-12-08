@@ -8,6 +8,7 @@ from unipa import UNIPA_Submit
 from unipa import UNIPA_Login
 from dotenv import load_dotenv
 from tools import list_to_dict
+from views.toolbar import AppToolbar
 
 # For testing
 ASSIGNMENTS = [
@@ -45,36 +46,29 @@ class HomeView(ft.UserControl):
         super().__init__(self)
         self.page = page
         # Header Components
-        self.name = ft.Text(
-            value="2022MXXX\nTaro Yamada",
-            width=120,
-            height=60,
-            size=20,
-            font_family="Inter",
-            text_align="Center",
-        )
         self.assignment_name = ft.Text(
-            value="",
-            width=560,
-            height=60,
+            value="dfafdafdafa",
             text_align="Center",
             font_family="Inter",
-            size=40,
-        )
-        self.header = ft.Container(
-            ft.Row(
-                [
-                    self.name,
-                    self.assignment_name,
-                ],
-            ),
-            padding=20,
+            size=30,
+            expand=1.0,
         )
         # Body Components
         self.retry_get_assignment_btn = ft.IconButton(
             icon=ft.icons.REFRESH, on_click=self.refresh_assignment_list
         )
-        self.lv = ft.ListView(expand=1.0, spacing=20, padding=20)
+        self.lv = ft.ListView(
+            controls=[
+                ft.Text(
+                    "Assignment List",
+                    text_align="Center",
+                    expand=1,
+                )
+            ],
+            spacing=20,
+            expand=1,
+            padding=5,
+        )
         # Controlling the assignments list according to assignments.
         if assignments == []:
             pass
@@ -91,11 +85,6 @@ class HomeView(ft.UserControl):
                         data=[assignments[_][1], assignments[_][2], assignments[_][4]],
                     )
                 )
-        self.assignment_list = ft.Container(
-            self.lv,
-            width=160,
-            height=304,
-        )
         self.pickfile = ft.FilePicker(on_result=self.assignment_file_selected)
         self.page.controls.append(self.pickfile)
         self.page.overlay.append(self.pickfile)
@@ -141,31 +130,36 @@ class HomeView(ft.UserControl):
                     self.file_submit_btn,
                 ]
             ),
-            padding=ft.padding.symmetric(horizontal=20),
         )
         self.body = ft.Container(
-            ft.Row(
+            ft.Column(
                 [
-                    self.assignment_list,
-                    ft.Column(
-                        [
-                            ft.Container(
-                                ft.Column(
-                                    [self.assignment_details],
-                                    expand=1,
-                                    scroll=ft.ScrollMode.HIDDEN,
-                                ),
-                                width=560,
-                                height=260,
-                                margin=ft.margin.only(left=20),
-                            ),
-                            self.assignment_submition,
-                        ],
+                    ft.Container(
+                        ft.Row(
+                            [self.assignment_name],
+                            expand=1,
+                            scroll=ft.ScrollMode.AUTO,
+                        ),
+                        height=80,
+                        width=580,
+                        alignment=ft.alignment.center,
+                        padding=ft.padding.only(0, 0, 0, 15),
                     ),
-                ]
+                    ft.Column(
+                        [self.assignment_details],
+                        expand=1,
+                        scroll=ft.ScrollMode.HIDDEN,
+                    ),
+                    self.assignment_submition,
+                ],
+                expand=1,
             ),
+            width=580,
+            height=444,
+            margin=ft.margin.only(0, 0, 30, 40),
         )
         self.page.snack_bar = ft.SnackBar(content=ft.Text("Submit Successful"))
+        self.toolbar = AppToolbar().toolbar
 
     def assignment_clicked(self, e):
         print(e.control.data)
@@ -265,13 +259,33 @@ class HomeView(ft.UserControl):
         self.update()
 
     def build(self):
-        return ft.Column([self.header, self.body])
+        return ft.Row(
+            [
+                self.toolbar,
+                ft.Container(
+                    self.lv,
+                    height=444,
+                    width=142,
+                    margin=ft.margin.only(15, 0, 12, 40),
+                    shadow=ft.BoxShadow(
+                        spread_radius=1,
+                        blur_radius=5,
+                        color=ft.colors.BLUE_GREY_300,
+                        offset=ft.Offset(0, 0),
+                        blur_style=ft.ShadowBlurStyle.OUTER,
+                    ),
+                ),
+                self.body,
+            ],
+        )
 
 
 def main(page: ft.Page):
     page.window_width = 896
     page.window_height = 504
     page.window_visible = True
+    page.padding = ft.padding.only(0, -10, 0, 0)
+    # get rid of the page padding
     page.add(HomeView(page, assignments=ASSIGNMENTS))
 
 

@@ -2,6 +2,7 @@ from flet import *
 from views.app import HomeView
 from views.login import LoginView
 from views.start import StartView
+from views.toolbar import AppToolbar
 
 ASSIGNMENTS = [
     [

@@ -28,10 +28,10 @@ def main(page: ft.Page):
         page.views.append(views_handler(page, assignments=assignments)[page.route])
 
     page.title = "ReUNIPA"
-    page.scroll = "ADAPTIVE"
     page.window_width = 896
     page.window_height = 504
     page.window_visible = True
+    page.padding = ft.padding.only(0, -10, 0, 0)
     # View handling
     page.on_route_change = route_change
     # On initial state
