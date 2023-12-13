@@ -10,6 +10,11 @@ from dotenv import load_dotenv
 from tools import list_to_dict
 from views.toolbar import AppToolbar
 
+from views.settings import SettingsView
+from views.attendance import AttendanceView
+from views.schedule import ScheduleView
+
+
 # For testing
 ASSIGNMENTS = [
     [
@@ -131,7 +136,7 @@ class HomeView(ft.UserControl):
                 ]
             ),
         )
-        self.body = ft.Container(
+        self.home_body = ft.Container(
             ft.Column(
                 [
                     ft.Container(
@@ -158,8 +163,30 @@ class HomeView(ft.UserControl):
             height=444,
             margin=ft.margin.only(0, 0, 30, 40),
         )
+        self.home_container = ft.Row(
+            [
+                ft.Container(
+                    self.lv,
+                    height=444,
+                    width=142,
+                    margin=ft.margin.only(15, 0, 12, 40),
+                    shadow=ft.BoxShadow(
+                        spread_radius=1,
+                        blur_radius=5,
+                        color=ft.colors.BLUE_GREY_300,
+                        offset=ft.Offset(0, 0),
+                        blur_style=ft.ShadowBlurStyle.OUTER,
+                    ),
+                ),
+                self.home_body,
+            ],
+        )
+        self.settings_container = SettingsView().settings_container
+        self.attendance_container = AttendanceView().attendance_container
+        self.schedule_container = ScheduleView().schedule_container
+        self.current_container = ft.Container(self.home_container)
         self.page.snack_bar = ft.SnackBar(content=ft.Text("Submit Successful"))
-        self.toolbar = AppToolbar().toolbar
+        self.toolbar = AppToolbar(app=self).toolbar
 
     def assignment_clicked(self, e):
         print(e.control.data)
@@ -258,24 +285,23 @@ class HomeView(ft.UserControl):
         self.file_submit_btn.visible = False
         self.update()
 
+    def change_container_view(self, target: str):
+        # self.current_container.clean()
+        if target == "home":
+            self.current_container.content = self.home_container
+        elif target == "attendance":
+            self.current_container.content = self.attendance_container
+        elif target == "schedule":
+            self.current_container.content = self.schedule_container
+        elif target == "settings":
+            self.current_container.content = self.settings_container
+        self.update()
+
     def build(self):
         return ft.Row(
             [
                 self.toolbar,
-                ft.Container(
-                    self.lv,
-                    height=444,
-                    width=142,
-                    margin=ft.margin.only(15, 0, 12, 40),
-                    shadow=ft.BoxShadow(
-                        spread_radius=1,
-                        blur_radius=5,
-                        color=ft.colors.BLUE_GREY_300,
-                        offset=ft.Offset(0, 0),
-                        blur_style=ft.ShadowBlurStyle.OUTER,
-                    ),
-                ),
-                self.body,
+                self.current_container,
             ],
         )
 
